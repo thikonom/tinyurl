@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:9.5-alpine
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123
+    volumes:
+      - ./scripts/db:/docker-entrypoint-initdb.d/
+  tinyurl:
+    build: .
+    depends_on:
+      - postgres
+      - redis
+      - kgs
+      - memcached
+    ports:
+      - 8080:8080
+  kgs:
+    build:
+      context: .
+      dockerfile: ./kgs/Dockerfile
+    depends_on:
+      - redis
+    ports:
+      - 8081:8081
+  redis:
+     image: "redis:alpine"
+     command: redis-server
+     ports:
+      - "6379:6379"
+     volumes:
+       - $PWD/redis-data:/var/lib/redis
+       - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+     environment:
+      - REDIS_REPLICATION_MODE=master
+  cache:
+    build:
+      context: .
+      dockerfile: ./cache/Dockerfile
+    depends_on:
+      - memcached
+      - postgres
+    ports:
+      - 8082:8082
+  memcached:
+    image: memcached
+    ports:
+      - 11211:11211
+    restart: always
