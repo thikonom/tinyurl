@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # curl -XPOST -H"Content-Type: application/json" http://localhost:8080/createTiny \
-#   -d'{"email": "thikonom@gmail.com", "original_url": "http://myurl/1"}'
+#   -d'{"email": "a@gmail.com", "original_url": "http://myurl/1"}'
 
 # curl -XPOST -H"Content-Type: application/json" http://localhost:8081/generateKey
 # curl -XGET -H"Content-Type: application/json" http://localhost:8081/getKey
